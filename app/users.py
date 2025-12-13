@@ -8,10 +8,10 @@ from fastapi_users.authentication import (
     JWTStrategy,
 )
 from fastapi_users.db import SQLAlchemyUserDatabase
-
+import os
 from app.database import User, get_user_db
 
-SECRET = "SECRET"
+SECRET = os.getenv("SECRET")
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):

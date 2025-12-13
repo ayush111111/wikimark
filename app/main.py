@@ -1,12 +1,14 @@
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from app.database import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
-
-
+from app.routers import wiki_search
+from app.routers import articles
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Not needed if you setup a migration system like Alembic
@@ -40,6 +42,12 @@ app.include_router(
     tags=["users"],
 )
 
+app.include_router(
+    wiki_search.wikisearch_router
+)
+app.include_router(
+    articles.article_router
+)
 
 @app.get("/authenticated-route")
 async def authenticated_route(user: User = Depends(current_active_user)):

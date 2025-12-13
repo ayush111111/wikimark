@@ -2,11 +2,14 @@ from typing import AsyncGenerator
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy import Integer, Column, String, JSON, ForeignKey
+from fastapi_users_db_sqlalchemy import GUID
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
-# 1. Connection String (Note the 'postgresql+asyncpg' scheme)
-# Format: postgresql+asyncpg://<user>:<password>@<host>:<port>/<db_name>
-DATABASE_URL = "postgresql+asyncpg://auth_user:securepassword@localhost:5432/auth_db"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://auth_user:securepassword@localhost:5432/auth_db")
 
 
 class Base(DeclarativeBase):
@@ -15,6 +18,16 @@ class Base(DeclarativeBase):
 #  UUID is the primary key ID for user.
 class User(SQLAlchemyBaseUserTableUUID, Base):
     pass
+
+class Article(Base):
+    __tablename__ = "articles"
+
+    id = Column(Integer, primary_key=True,index=True)
+    title = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    tags = Column(JSON, nullable=False) # JSON List
+
+    user_id = Column(GUID, ForeignKey("user.id"))
 
 
 engine = create_async_engine(DATABASE_URL)

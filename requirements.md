@@ -42,6 +42,8 @@ retry logic for gemini apis (lets start with)
 
 The wikipedia Python library sometimes fails if it hits a disambiguation page (e.g., searching "Apple" might error because it doesn't know if you mean the fruit or the company).
 
+introduce session rollback() in try excepts
+
 dspy for tagging
 
 -----------------

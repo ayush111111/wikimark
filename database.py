@@ -1,1 +1,0 @@
-# interact with models using sqlalchemy

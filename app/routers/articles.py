@@ -83,7 +83,7 @@ async def update_article_tag(
     article = result.scalar()
 
     if not article:
-        raise HTTPException(status_code="404", detail="Article to be updated is not found")
+        raise HTTPException(status_code=404, detail="Article to be updated is not found")
     
     article.tags = new_tags.tags
 
@@ -113,7 +113,7 @@ async def delete(
     article = result.scalar()
 
     if not article:
-        raise HTTPException(status_code="404", detail="Article to be deleted is not found")
+        raise HTTPException(status_code=404, detail="Article to be deleted is not found")
     
     await session.delete(article)
     await session.commit()

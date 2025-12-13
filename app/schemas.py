@@ -1,5 +1,5 @@
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from typing import List
 from fastapi_users import schemas
 
@@ -35,5 +35,8 @@ class ArticleRead(BaseModel):
     class Config:
         from_attributes = True
 
+    @field_serializer('id')
+    def serialize_id(self, value: int) -> str:
+        return str(value)
 class ArticleUpdateTags(BaseModel):
     tags: List[str]

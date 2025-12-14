@@ -2,6 +2,7 @@
 from fastapi import Depends, APIRouter, HTTPException
 from .. import schemas
 from ..services import wikipedia_client
+from ..services.async_wikipedia_client import async_wiki_client
 from ..users import current_active_user
 from typing import List
 
@@ -19,3 +20,17 @@ def search(
         return articles
     except Exception as e:
         raise e
+
+@wikisearch_router.get("/search-async",response_model=List[schemas.WikiSearchItem])
+async def async_search(
+    query : str,
+    user = Depends(current_active_user)
+):
+    try:
+        if not query:
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
+        articles = await async_wiki_client.search_with_fallback(query, limit=5)
+        return articles
+    except Exception as e:
+        raise e
+

@@ -19,6 +19,7 @@ class UserUpdate(schemas.BaseUserUpdate):
 class WikiSearchItem(BaseModel):
     title: str
     summary : str | None
+    url : str | None
 
 class WikiSearchResult(BaseModel):
     result: List[WikiSearchItem]

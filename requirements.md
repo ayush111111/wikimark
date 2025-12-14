@@ -48,6 +48,11 @@ parallel requests
 
 rate limit error handling
 
+add tests
+
+add linters, auto sort imports etc
+
+summary() calls page() internally - storing this can avoid API calls while bookmarking
 dspy for tagging
 
 -----------------

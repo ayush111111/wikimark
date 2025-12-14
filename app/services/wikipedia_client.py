@@ -11,30 +11,29 @@ def search_wikipedia(query: str, limit: int = 5):
         if not search_results and suggestion:
             search_results = wikipedia.search(query=suggestion, results = limit)
         for title in search_results:
-            if title in articles:
-                continue
+
             try:
-                summary_text = wikipedia.summary(title, sentences=1, auto_suggest=False)
-                articles.append({"title": title, "summary": summary_text})
+                page = wikipedia.page(title,  auto_suggest=False)
+                articles.append({"title": title, "summary": page.summary, "url":page.url})
                 
             except wikipedia.exceptions.DisambiguationError as e: 
 
                 for option in e.options[:3]:
                     try:
-                        summary_text = wikipedia.summary(option, sentences=1, auto_suggest=False)
-                        articles.append({"title": option, "summary": summary_text})     
+                        page = wikipedia.page(option,  auto_suggest=False)
+                        articles.append({"title": option, "summary": page.summary, "url":page.url})     
                         break # if valid article is found - prompt user fpr a clarification in UI?
                     except wikipedia.exceptions.DisambiguationError as e: 
                         continue # cannot handle nested ambiguation, if first three are invalid 
                 
             except wikipedia.exceptions.PageError:
                 # article not found, retry with auto-suggest to handle typos ("Pytjon" -> "Python")
-                summary_text = wikipedia.summary(title, sentences=1, auto_suggest=True) # 
-                articles.append({"title": title, "summary": summary_text})    
+                page = wikipedia.page(title,auto_suggest=True) # 
+                articles.append({"title": title, "summary": page.summary, "url":page.url})    
                 continue
             except Exception as e:
                 print(f"Error fetching {title}: {e}")
-                articles.append({"title": title, "summary": None})
+                articles.append({"title": title, "summary": None, "url": None})
         return articles
     except Exception as e:
         # log 

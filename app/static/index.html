@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WikiMark - Search</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>WikiMark - Wikipedia Search</h1>
+            
+        <div id="auth-section">
+            <h2>Login</h2>
+            <input type="email" id="email" placeholder="Email" value="ayush@ayush.com">
+            <input type="password" id="password" placeholder="Password" value="pass">
+            <button onclick="login()">Login</button>
+            <button onclick="showSignup()">Sign Up</button>
+            <p id="auth-status"></p>
+            
+            <div id="signup-form" style="display:none;">
+                <h3>Create Account</h3>
+                <input type="email" id="signup-email" placeholder="Email">
+                <input type="password" id="signup-password" placeholder="Password">
+                <button onclick="signup()">Create Account</button>
+                <button onclick="showLogin()">Back to Login</button>
+            </div>
+        </div>
+
+        <div id="search-section" style="display:none;">
+            <h2>Search Wikipedia</h2>
+            <button onclick="logout()">Logout</button>
+            <input type="text" id="search-query" placeholder="Enter search term">
+            <button onclick="search()">Search</button>
+            <button onclick="goToBookmarks()">View Bookmarks</button>
+            
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
+

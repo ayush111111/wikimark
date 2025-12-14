@@ -68,14 +68,14 @@ async def get_all_articles(
 # update article
 @article_router.patch("/{article_id}", response_model=schemas.ArticleRead)
 async def update_article_tag(
-        article_id: int,
+        article_id: str,
         new_tags: schemas.ArticleUpdateTags,
         user = Depends(current_active_user),
         session = Depends(database.get_async_session)
 ):
     
     sql = select(database.Article).where(
-        database.Article.id == article_id,
+        database.Article.id == int(article_id),
         database.Article.user_id == user.id
     )
 
@@ -99,13 +99,13 @@ async def update_article_tag(
 # update article
 @article_router.delete("/{article_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete(
-        article_id: int,
+        article_id: str,
         user = Depends(current_active_user),
         session = Depends(database.get_async_session)
 ):
     
     sql = select(database.Article).where(
-        database.Article.id == article_id,
+        database.Article.id == int(article_id),
         database.Article.user_id == user.id
     )
 

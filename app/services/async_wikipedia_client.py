@@ -61,17 +61,17 @@ class AsyncWikipediaClient:
         try:
             page = await loop.run_in_executor(
                 self.executor,
-                lambda: wikipedia.page(title, auto_suggest=True) # suggests resolve spellchecks
+                lambda: wikipedia.page(title, auto_suggest=False) # suggests resolve spellchecks, but also replaces "Mouse" to "House"
             )
 
         except wikipedia.exceptions.DisambiguationError as e:
             return await self._handle_ambiguation(e.options)
         except wikipedia.exceptions.PageError as e:
-            return await self._handle_page_error(title)
+            return await self._handle_page_error(page.title)
         except Exception as e:
             return {"title": title, "summary": None, "url": None}
         
-        return {"title": title, "summary": page.summary, "url":page.url}
+        return {"title": page.title, "summary": page.summary, "url":page.url}
 
     async def _handle_ambiguation(
             self,
@@ -88,7 +88,7 @@ class AsyncWikipediaClient:
                     self.executor,
                     lambda current_option=option:wikipedia.page(current_option, auto_suggest=False)
                 ) # store in another variable so that it is passed correctly
-                return {"title": option, "summary": page.summary, "url": page.url}
+                return {"title": page.title, "summary": page.summary, "url": page.url}
                 # break
             except wikipedia.exceptions.DisambiguationError as e:
                 continue

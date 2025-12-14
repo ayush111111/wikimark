@@ -1,6 +1,6 @@
 
 import wikipedia
-wikipedia.set_user_agent("WikiApp/1.0 (your-email@example.com)")
+wikipedia.set_user_agent("WikiMark/1.0 (lokareaayush@gmail.com)")
 
 def search_wikipedia(query: str, limit: int = 5):
     """returns search results with summaries"""
@@ -42,8 +42,6 @@ def search_wikipedia(query: str, limit: int = 5):
         return []
 
 
-def fetch_wiki_synchronous(title):
-    """"""
 if __name__== "__main__":
     res = search_wikipedia(query="dolphin", limit=5)
     print(res)

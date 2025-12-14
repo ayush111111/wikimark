@@ -35,19 +35,18 @@ async def websocket_search(
 
             await websocket.send_json({"type": "search_start", "query": query})
 
-            results  = await async_wiki_client.search_with_fallback(query=query)
-
-            for i,res in enumerate(results):
-                await websocket.send_json(
-                    {
-                        "type": "result",
-                        "data" : res,
-                        "index": i,
-                        "total": len(results)
-                    }
-                )
+            count = 0
+            async for article in async_wiki_client.search_with_streaming(query, limit=5):
+                count += 1
+                await websocket.send_json({
+                    "type": "result",
+                    "data": article,
+                    "index": count
+                })
             
-            await websocket.send_json({"type":"search_end", "total": len(results)})
+            await websocket.send_json({"type": "search_complete", "total": count})
+            
+            await websocket.send_json({"type":"search_end", "total": len(count)})
 
     except WebSocketDisconnect as e:
         manager.disconnect(websocket=websocket)

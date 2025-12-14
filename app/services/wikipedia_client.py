@@ -29,8 +29,8 @@ def search_wikipedia(query: str, limit: int = 5):
                 
             except wikipedia.exceptions.PageError:
                 # article not found, retry with auto-suggest to handle typos ("Pytjon" -> "Python")
-                summary_text = wikipedia.summary(e.options[0], sentences=1, auto_suggest=True) # 
-                articles.append({"title": e.options[0], "summary": summary_text})    
+                summary_text = wikipedia.summary(title, sentences=1, auto_suggest=True) # 
+                articles.append({"title": title, "summary": summary_text})    
                 continue
             except Exception as e:
                 print(f"Error fetching {title}: {e}")

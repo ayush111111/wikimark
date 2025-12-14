@@ -44,6 +44,10 @@ The wikipedia Python library sometimes fails if it hits a disambiguation page (e
 
 introduce session rollback() in try excepts
 
+parallel requests
+
+rate limit error handling
+
 dspy for tagging
 
 -----------------

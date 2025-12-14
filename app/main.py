@@ -9,7 +9,7 @@ from app.database import User, create_db_and_tables
 from app.schemas import UserCreate, UserRead, UserUpdate
 from app.users import auth_backend, current_active_user, fastapi_users
 from app.routers import wiki_search
-from app.routers import articles
+from app.routers import articles, websocket_routes
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Not needed if you setup a migration system like Alembic
@@ -50,6 +50,9 @@ app.include_router(
 )
 app.include_router(
     articles.article_router
+)
+app.include_router(
+    websocket_routes.ws_router
 )
 
 @app.get("/authenticated-route")

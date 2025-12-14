@@ -91,7 +91,13 @@ class AsyncWikipediaClient:
                 return {"title": page.title, "summary": page.summary, "url": page.url}
                 # break
             except wikipedia.exceptions.DisambiguationError as e:
-                continue
+                continue 
+            except wikipedia.exceptions.PageError as e:
+                page = await loop.run_in_executor(
+                    self.executor,
+                    lambda: wikipedia.page(option, auto_suggest=True) # suggests resolve spellchecks
+                )
+                return {"title": page.title, "summary": page.summary, "url": page.url}
             
     async def _handle_page_error(
             self,
@@ -114,6 +120,43 @@ class AsyncWikipediaClient:
 
         return {"title": new_title, "summary": page.summary, "url": page.url}
     
+    async def streaming_search(self, query: str, limit: int = 5):
+        """yield results as they are completed"""
 
+        self.seen_titles.clear()
+        loop = asyncio.get_event_loop()
+
+        search_results, suggestion = await loop.run_in_executor(
+            self.executor,
+            lambda: wikipedia.search(query=query, results=limit, suggestion=True)
+        )
+
+        if not search_results and suggestion:
+            search_results = await loop.run_in_executor(
+                self.executor,
+                lambda: wikipedia.search(query=suggestion, results=limit, suggestion=False)
+            )
+        
+
+        tasks = [self._fetch_with_fallbacks(title=title) for title in search_results[:limit]]
+        
+        # results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        articles = []
+        for task in asyncio.as_completed(tasks):
+            result = await task
+            if result and not isinstance(result, Exception):
+                yield result 
+
+        # return articles
 
 async_wiki_client = AsyncWikipediaClient(max_workers=10)
+
+
+# async def main():
+
+#     stream = async_wiki_client.streaming_search(query="blue", limit=5)
+#     async for result in stream:
+#         print(result)
+
+# asyncio.run(main(), debug=True)

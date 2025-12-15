@@ -11,7 +11,7 @@ class AsyncWikipediaClient:
 
     def __init__(self, max_workers=10):
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
-        self.seen_titles = set()    
+          
         
     async def search_with_fallback(
             self, 
@@ -20,7 +20,7 @@ class AsyncWikipediaClient:
         ):
         """parallel search with fallbacks"""
 
-        self.seen_titles.clear()
+        seen_titles = set() 
         loop = asyncio.get_event_loop()
         
         search_results, suggestion = await loop.run_in_executor(
@@ -37,7 +37,7 @@ class AsyncWikipediaClient:
 
         if not search_results: return []
 
-        tasks = [self._fetch_with_fallbacks(title) for title in search_results[:limit]]
+        tasks = [self._fetch_with_fallbacks(title, seen_titles) for title in search_results[:limit]]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
@@ -50,12 +50,12 @@ class AsyncWikipediaClient:
     async def _fetch_with_fallbacks(
             self,
             title: str,
-
+            seen_titles : set
     ):
         """fetch summary or call specific fallbacks"""
-        if title in self.seen_titles:
+        if title in seen_titles:
             return None
-        self.seen_titles.add(title) # avoid calling again (in case disambiguation logic fetches it)        
+        seen_titles.add(title) # avoid calling again (in case disambiguation logic fetches it)        
         loop = asyncio.get_event_loop()
         print(f"[START] Fetching: {title}")
         try:
@@ -65,9 +65,9 @@ class AsyncWikipediaClient:
             )
 
         except wikipedia.exceptions.DisambiguationError as e:
-            return await self._handle_ambiguation(e.options)
+            return await self._handle_ambiguation(e.options, seen_titles)
         except wikipedia.exceptions.PageError as e:
-            return await self._handle_page_error(page.title)
+            return await self._handle_page_error(page.title, seen_titles)
         except Exception as e:
             return {"title": title, "summary": None, "url": None}
         
@@ -75,15 +75,19 @@ class AsyncWikipediaClient:
 
     async def _handle_ambiguation(
             self,
-            options: List[str]
+            options: List[str],
+            seen_titles : set
     ):
         loop = asyncio.get_event_loop()
+        
         for option in options:
-            if option in self.seen_titles:
+            print(f"[START] -disambiguation Fetching: {option}") # add async here
+            if option in seen_titles:
                 continue
-            self.seen_titles.add(option)
+            seen_titles.add(option)
             
             try:
+
                 page = await loop.run_in_executor(
                     self.executor,
                     lambda current_option=option:wikipedia.page(current_option, auto_suggest=False)
@@ -95,7 +99,8 @@ class AsyncWikipediaClient:
             
     async def _handle_page_error(
             self,
-            title : str
+            title : str,
+            seen_titles : set
     ):
         loop = asyncio.get_event_loop()
 

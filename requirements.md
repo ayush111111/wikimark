@@ -55,6 +55,9 @@ add linters, auto sort imports etc
 summary() calls page() internally - storing this can avoid API calls while bookmarking
 dspy for tagging
 
+switch to calling the endpoints directly using httpx
+
+test with multiple async requests in parallel
 -----------------
 priority / to do list
 1. log in/sign up
@@ -63,3 +66,9 @@ priority / to do list
 4. edit
 
 
+
+REferences
+https://github.com/fastapi-users/fastapi-users/tree/bcee8c9b884de31decb5d799aead3974a0b5b158/examples/sqlalchemy/app
+https://betterstack.com/community/guides/scaling-python/authentication-fastapi/
+https://docs.python.org/3/library/asyncio-task.html#asyncio.as_completed
+https://stackoverflow.com/questions/79529978/typeerror-do-not-know-how-to-serialize-a-bigint-when-json-stringifyobject

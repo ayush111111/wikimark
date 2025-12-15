@@ -20,6 +20,7 @@ class WikiSearchItem(BaseModel):
     title: str
     summary : str | None
     url : str | None
+    key: str | None = None  # only REST endpoint returns it, ideally should be compulsary
 
 class WikiSearchResult(BaseModel):
     result: List[WikiSearchItem]

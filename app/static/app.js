@@ -34,7 +34,7 @@ async function login() {
 async function search() {
     const query = document.getElementById('search-query').value;
     
-    const response = await fetch(`/wiki/search-async?query=${query}`, {
+    const response = await fetch(`/wiki/search-rest?query=${query}`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -60,7 +60,7 @@ function displayResults(articles) {
         
         const bookmarkBtn = document.createElement('button');
         bookmarkBtn.textContent = 'Bookmark';
-        bookmarkBtn.onclick = () => bookmark(article.title, article.url);
+        bookmarkBtn.onclick = () => bookmark(article.key);  // key instead
         
         div.appendChild(title);
         div.appendChild(summary);
@@ -68,9 +68,8 @@ function displayResults(articles) {
         resultsDiv.appendChild(div);
     });
 }
-
-async function bookmark(title, url) {
-    const response = await fetch(`/articles/?title=${encodeURIComponent(title)}`, {
+async function bookmark(key) {
+    const response = await fetch(`/articles/?article_key=${encodeURIComponent(key)}`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`

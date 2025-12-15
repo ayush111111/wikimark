@@ -3,6 +3,7 @@ from fastapi import Depends, APIRouter, HTTPException
 from .. import schemas
 from ..services import wikipedia_client
 from ..services.async_wikipedia_client import async_wiki_client
+from ..services.wikipedia_rest_client import WikipediaRestClient
 from ..users import current_active_user
 from typing import List
 
@@ -34,3 +35,18 @@ async def async_search(
     except Exception as e:
         raise e
 
+
+@wikisearch_router.get("/search-rest",response_model=List[schemas.WikiSearchItem])
+async def rest_search(
+    query : str,
+    user = Depends(current_active_user)
+):
+    try:
+        if not query:
+            raise HTTPException(status_code=400, detail="Query cannot be empty")
+
+        client = WikipediaRestClient()
+        articles = await client.search(query, limit=5)
+        return articles
+    except Exception as e:
+        raise e

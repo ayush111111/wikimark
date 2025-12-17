@@ -18,7 +18,6 @@ class Base(DeclarativeBase):
 #  UUID is the primary key ID for user.
 class User(SQLAlchemyBaseUserTableUUID, Base):
     pass
-
 class Article(Base):
     __tablename__ = "articles"
 

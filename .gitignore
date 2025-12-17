@@ -7,3 +7,5 @@ logs.md
 *.pyc
 
 *.sql
+
+alembic.ini

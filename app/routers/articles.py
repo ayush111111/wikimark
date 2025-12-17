@@ -5,6 +5,8 @@ from ..users import current_active_user
 from ..services import content_tagging
 from sqlalchemy import select, desc
 from typing import List
+import os
+LIMIT = os.getenv('LIMIT')
 
 article_router = APIRouter(prefix="/articles",tags=["Article"])
 
@@ -17,6 +19,15 @@ async def save_article(
         session = Depends(database.get_async_session)
 ):
     wiki_client = WikipediaRestClient()
+    sql = select(database.Article).where(
+        database.Article.user_id == user.id,  
+    )
+    result = await session.execute(sql)
+    articles = result.scalars().all()
+    count = len(articles)
+    if count > int(LIMIT):
+        raise HTTPException(status_code=403, detail="Article count exceeds limit")
+    
     page = await wiki_client.get_page_summary(key=article_key)
     # check if title exists already - return
     sql = select(database.Article).where(
